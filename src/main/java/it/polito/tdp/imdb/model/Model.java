@@ -18,6 +18,9 @@ public class Model {
 	private Graph<Movie, DefaultWeightedEdge> grafo;
 	private List<Movie> vertici;
 	private Map<Integer,  Movie> moviesIdMap;
+	private double pesoPre = 0;
+	
+	private List<Movie> cammino = new ArrayList<>();
 	
 	public Model() {
 		this.dao = new ImdbDAO();
@@ -74,24 +77,24 @@ public class Model {
 	
 	public List<Movie> calcolaCammino(Movie partenza){
 		
-		List<Movie> cammino = new ArrayList<>();
-		
 		List<Movie> parziale = new ArrayList<>();
-		
-		double pesoP = 0;
 		
 		parziale.add(partenza);
 		
-		ricorsione(parziale, pesoP);
+		ricorsione(parziale, pesoPre);
 		
-		cammino = new ArrayList<>(parziale);		
 		return cammino;
 		
 	}
 	
 	
 	
-	public void ricorsione(List<Movie> parziale, double pesoP) {
+	public void ricorsione(List<Movie> parziale, double pesoPre) {
+		
+		if(parziale.size() == this.vertici.size()) {
+			
+			this.cammino = new ArrayList<>(parziale);
+		}
 		
 		List<Movie> adiacenti = Graphs.neighborListOf(this.grafo, parziale.get(parziale.size()-1));
 		
@@ -99,12 +102,12 @@ public class Model {
 			
 			DefaultWeightedEdge e = this.grafo.getEdge(parziale.get(parziale.size()-1), m);
 			
-			double peso = this.grafo.getEdgeWeight(e);
+			double pesoArco = this.grafo.getEdgeWeight(e);
 			
-			if(peso>=pesoP && !parziale.contains(m)) {
+			if(pesoArco>=pesoPre && !parziale.contains(m)) {
 				parziale.add(m);
-				pesoP = peso;
-				ricorsione(parziale, pesoP);
+				pesoPre = pesoArco;
+				ricorsione(parziale, pesoPre);
 				parziale.remove(parziale.size()-1);
 			}
 		}
@@ -123,9 +126,5 @@ public class Model {
 	public String infoGrafo() {
 		return "Grafo creato!\n#Vertici: "+this.grafo.vertexSet().size()+"\n#Archi: "+this.grafo.edgeSet().size();
 	}
-
-	
-	
-	
 	
 }

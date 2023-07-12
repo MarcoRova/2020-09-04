@@ -63,8 +63,6 @@ public class FXMLController {
     	for(Movie mo : cammino) {
     		this.txtResult.appendText("\n"+mo);
     	}
-    	
-    	
 
     }
 
