@@ -5,9 +5,11 @@
 package it.polito.tdp.imdb;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import it.polito.tdp.imdb.model.Model;
+import it.polito.tdp.imdb.model.Movie;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -38,23 +40,76 @@ public class FXMLController {
     private TextField txtRank; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbMovie"
-    private ComboBox<?> cmbMovie; // Value injected by FXMLLoader
+    private ComboBox<Movie> cmbMovie; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtResult"
     private TextArea txtResult; // Value injected by FXMLLoader
 
     @FXML
     void doCammino(ActionEvent event) {
+    	
+    	this.txtResult.clear();
+    	
+    	Movie m = this.cmbMovie.getValue();
+    	
+    	if(m == null) {
+    		this.txtResult.appendText("Devi selezionare un film per continuare.");
+    		return;
+    	}
+    	
+    	List<Movie> cammino = this.model.calcolaCammino(m);
+    	
+    	
+    	for(Movie mo : cammino) {
+    		this.txtResult.appendText("\n"+mo);
+    	}
+    	
+    	
 
     }
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
     	
+    	this.txtResult.clear();
+    	    	
+    	Double rank = 0.0;
+    	
+    	try {
+    		rank = Double.parseDouble(this.txtRank.getText());
+    		
+    		if(rank< 0.0 || rank > 10.0){
+    			this.txtResult.setText("Inserire un rank tra 0 e 10.");
+    			return;
+    		}
+    	}catch(NumberFormatException e) {
+    		txtResult.setText("Formato non corretto per il rank.");
+    		return;
+    	}
+    	
+    	
+    	this.model.creaGrafo(rank);
+    	
+    	this.txtResult.appendText(this.model.infoGrafo());
+    	
+    	this.btnGrandoMax.setDisable(false);
+    	this.btnCammino.setDisable(false);
+    	
+    	this.cmbMovie.getItems().addAll(this.model.getVertici());
+    	
     }
 
     @FXML
     void doGradoMax(ActionEvent event) {
+    	
+    	this.txtResult.clear();
+    	
+    	if(this.model.gradoMassimo() == null) {
+    		this.txtResult.appendText("Grado massimo non disponibie per questi parametri.");
+    		return;
+    	}
+    	
+    	this.txtResult.appendText(this.model.gradoMassimo().getM()+" ("+this.model.gradoMassimo().getSomma()+")");
     	
     }
 
@@ -70,5 +125,7 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	this.btnGrandoMax.setDisable(true);
+    	this.btnCammino.setDisable(true);
     }
 }

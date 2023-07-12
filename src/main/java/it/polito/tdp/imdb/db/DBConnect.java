@@ -8,7 +8,7 @@ import com.zaxxer.hikari.HikariDataSource;
 
 public class DBConnect {
 
-	private static final String jdbcURL = "jdbc:mysql://localhost/imdb_0408";
+	private static final String jdbcURL = "jdbc:mariadb://localhost/imdb_0408";
 	private static HikariDataSource ds;
 	
 	public static Connection getConnection() {
